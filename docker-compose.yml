@@ -1,0 +1,30 @@
+version: '2'
+
+services:
+  fluentd:
+    image: fluentd:es
+    volumes:
+      - ./fluentd:/fluentd/etc
+    links:
+      - "elasticsearch"
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"
+    environment:
+      - "FLUENTD_CONF=fluentd.conf"
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.3.0
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - "discovery.type=single-node"
+    volumes:
+      - ./elasticsearch/data:/usr/share/elasticsearch/data
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.3.0
+    links:
+      - "elasticsearch"
+    ports:
+      - "5601:5601"
